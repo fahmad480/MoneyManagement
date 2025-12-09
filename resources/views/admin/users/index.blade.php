@@ -9,26 +9,28 @@
         <a href="{{ route('admin.users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
             <i class="fas fa-plus"></i>
             Tambah User
-        </div>
+        </a>
     </div>
 
     <!-- Filter & Search -->
     <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Cari</label>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama, email, telepon..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <form method="GET" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cari</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama, email, telepon..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <select name="role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Semua Role</option>
+                        @foreach($roles as $role)
+                        <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                <select name="role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">Semua Role</option>
-                    @foreach($roles as $role)
-                    <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="md:col-span-3 flex gap-2">
+            <div class="flex gap-2">
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                     <i class="fas fa-search mr-2"></i>Filter
                 </button>
