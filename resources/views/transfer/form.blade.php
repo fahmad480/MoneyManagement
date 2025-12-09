@@ -12,22 +12,6 @@
             <h1 class="text-3xl font-bold text-gray-800">Transfer Antar Rekening</h1>
         </div>
 
-        <!-- Success Message -->
-        @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center">
-            <i class="fas fa-check-circle mr-3"></i>
-            <span>{{ session('success') }}</span>
-        </div>
-        @endif
-
-        <!-- Error Message -->
-        @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 flex items-center">
-            <i class="fas fa-exclamation-circle mr-3"></i>
-            <span>{{ session('error') }}</span>
-        </div>
-        @endif
-
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Transfer Form -->
             <div class="lg:col-span-2">

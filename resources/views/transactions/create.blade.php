@@ -12,12 +12,6 @@
             <h1 class="text-3xl font-bold text-gray-800">Tambah Transaksi</h1>
         </div>
 
-        @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {{ session('error') }}
-        </div>
-        @endif
-
         <div class="bg-white rounded-lg shadow p-6">
             <form action="{{ route('transactions.store') }}" method="POST" id="transactionForm">
                 @csrf

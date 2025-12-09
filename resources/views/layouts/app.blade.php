@@ -36,6 +36,50 @@
         <main class="@auth md:ml-64 @endauth min-h-screen">
             @auth
                 <div class="py-6 px-4 sm:px-6 lg:px-8">
+                    <!-- Flash Messages -->
+                    @if(session('success'))
+                    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" class="bg-green-50 border-l-4 border-green-400 text-green-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between" role="alert">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-600 mr-3 text-xl"></i>
+                            <span>{{ session('success') }}</span>
+                        </div>
+                        <button @click="show = false" class="text-green-600 hover:text-green-800">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    @endif
+
+                    @if(session('error'))
+                    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" class="bg-red-50 border-l-4 border-red-400 text-red-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between" role="alert">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle text-red-600 mr-3 text-xl"></i>
+                            <span>{{ session('error') }}</span>
+                        </div>
+                        <button @click="show = false" class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    @endif
+
+                    @if($errors->any())
+                    <div x-data="{ show: true }" x-show="show" class="bg-red-50 border-l-4 border-red-400 text-red-800 px-4 py-3 rounded-lg mb-6" role="alert">
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-red-600 mr-3 text-xl mt-0.5"></i>
+                            <div class="flex-1">
+                                <p class="font-semibold mb-2">Terdapat kesalahan pada input:</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            <button @click="show = false" class="text-red-600 hover:text-red-800 ml-3">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    @endif
+                    
                     @yield('content')
                 </div>
             @else

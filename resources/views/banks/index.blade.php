@@ -24,22 +24,6 @@
         </div>
     </div>
 
-    <!-- Success Alert -->
-    @if(session('success'))
-    <div class="bg-green-50 border-l-4 border-green-400 text-green-800 px-4 py-3 rounded-lg mb-6 flex items-center" role="alert">
-        <i class="fas fa-check-circle text-green-600 mr-3 text-xl"></i>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
-
-    <!-- Error Alert -->
-    @if(session('error'))
-    <div class="bg-red-50 border-l-4 border-red-400 text-red-800 px-4 py-3 rounded-lg mb-6 flex items-center" role="alert">
-        <i class="fas fa-exclamation-circle text-red-600 mr-3 text-xl"></i>
-        <span>{{ session('error') }}</span>
-    </div>
-    @endif
-
     <!-- Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
