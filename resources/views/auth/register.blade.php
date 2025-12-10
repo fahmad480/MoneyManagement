@@ -65,8 +65,11 @@
                             <i class="fas fa-lock text-gray-400"></i>
                         </div>
                         <input id="password" name="password" type="password" autocomplete="new-password" required 
-                               class="appearance-none rounded-lg relative block w-full pl-10 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                               class="appearance-none rounded-lg relative block w-full pl-10 pr-10 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
                                placeholder="Password">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onclick="togglePassword('password')">
+                            <i id="password-eye" class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                        </div>
                     </div>
                 </div>
                 
@@ -77,8 +80,11 @@
                             <i class="fas fa-lock text-gray-400"></i>
                         </div>
                         <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required 
-                               class="appearance-none rounded-lg relative block w-full pl-10 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                               class="appearance-none rounded-lg relative block w-full pl-10 pr-10 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
                                placeholder="Konfirmasi password">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onclick="togglePassword('password_confirmation')">
+                            <i id="password_confirmation-eye" class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -109,6 +115,21 @@
 
 @push('scripts')
 <script>
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const eye = document.getElementById(fieldId + '-eye');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        eye.classList.remove('fa-eye');
+        eye.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        eye.classList.remove('fa-eye-slash');
+        eye.classList.add('fa-eye');
+    }
+}
+
 $(document).ready(function() {
     $('#register-form').on('submit', function(e) {
         e.preventDefault();

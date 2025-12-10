@@ -75,6 +75,13 @@
                 </a>
             </li>
             
+            <li>
+                <a href="{{ route('profile.index') }}" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 {{ request()->routeIs('profile.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                    <i class="fas fa-user-cog w-5"></i>
+                    <span class="ml-3">Pengaturan Akun</span>
+                </a>
+            </li>
+            
             @can('manage-users')
             <li class="mt-6">
                 <p class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Admin</p>

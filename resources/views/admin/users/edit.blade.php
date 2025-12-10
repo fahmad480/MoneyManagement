@@ -86,6 +86,40 @@
                         @enderror
                     </div>
 
+                    <!-- Email Verification Status -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-medium mb-2">Status Verifikasi Email</label>
+                        <div class="flex items-center space-x-6">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="email_verification_status" value="verified" 
+                                    @if(old('email_verification_status', !is_null($user->email_verified_at) ? 'verified' : 'unverified') === 'verified') checked @endif
+                                    class="mr-2 text-blue-600 focus:ring-blue-500">
+                                <span class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                                    <span class="text-gray-700">Terverifikasi</span>
+                                </span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="email_verification_status" value="unverified" 
+                                    @if(old('email_verification_status', !is_null($user->email_verified_at) ? 'verified' : 'unverified') === 'unverified') checked @endif
+                                    class="mr-2 text-blue-600 focus:ring-blue-500">
+                                <span class="flex items-center">
+                                    <i class="fas fa-times-circle text-red-600 mr-2"></i>
+                                    <span class="text-gray-700">Belum Terverifikasi</span>
+                                </span>
+                            </label>
+                        </div>
+                        @if(!is_null($user->email_verified_at))
+                        <p class="text-sm text-gray-500 mt-2">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Diverifikasi pada: {{ $user->email_verified_at->format('d M Y, H:i') }}
+                        </p>
+                        @endif
+                        @error('email_verification_status')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Current Photo -->
                     @if($user->profile_photo)
                     <div class="md:col-span-2">

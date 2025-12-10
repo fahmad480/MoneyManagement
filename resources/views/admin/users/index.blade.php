@@ -15,7 +15,7 @@
     <!-- Filter & Search -->
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <form method="GET" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Cari</label>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama, email, telepon..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -27,6 +27,14 @@
                         @foreach($roles as $role)
                         <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
                         @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status Email</label>
+                    <select name="verified" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Semua Status</option>
+                        <option value="yes" {{ request('verified') == 'yes' ? 'selected' : '' }}>Terverifikasi</option>
+                        <option value="no" {{ request('verified') == 'no' ? 'selected' : '' }}>Belum Verifikasi</option>
                     </select>
                 </div>
             </div>
@@ -86,6 +94,7 @@
                             @endif
                         </a>
                     </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status Email</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                 </tr>
@@ -112,6 +121,19 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->email }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
+                        @if($user->email_verified_at)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <i class="fas fa-check-circle mr-1"></i>
+                                Terverifikasi
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <i class="fas fa-times-circle mr-1"></i>
+                                Belum Verifikasi
+                            </span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
                         @foreach($user->roles as $role)
                         <span class="px-2 py-1 text-xs font-semibold rounded-full 
                             {{ $role->name == 'superadmin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' }}">
@@ -120,19 +142,36 @@
                         @endforeach
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{{ route('admin.users.edit', $user->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        @if($user->id !== auth()->user()->id)
-                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline" 
-                            onsubmit="return confirm('Yakin ingin menghapus user ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-900">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                        @endif
+                        <div class="flex items-center gap-2">
+                            <!-- Toggle Email Verification -->
+                            @if($user->id !== auth()->user()->id)
+                            <form action="{{ route('admin.users.toggle-verification', $user->id) }}" method="POST" class="inline"
+                                onsubmit="return confirm('Yakin ingin mengubah status verifikasi email user ini?');">
+                                @csrf
+                                @method('POST')
+                                <button type="submit" class="text-amber-600 hover:text-amber-900" title="{{ $user->email_verified_at ? 'Batalkan Verifikasi' : 'Verifikasi Email' }}">
+                                    <i class="fas fa-{{ $user->email_verified_at ? 'user-times' : 'user-check' }}"></i>
+                                </button>
+                            </form>
+                            @endif
+                            
+                            <!-- Edit -->
+                            <a href="{{ route('admin.users.edit', $user->id) }}" class="text-indigo-600 hover:text-indigo-900" title="Edit User">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            
+                            <!-- Delete -->
+                            @if($user->id !== auth()->user()->id)
+                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline" 
+                                onsubmit="return confirm('Yakin ingin menghapus user ini?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-900" title="Hapus User">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            @endif
+                        </div>
                     </td>
                 </tr>
                 @endforeach

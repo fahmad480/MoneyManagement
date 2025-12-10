@@ -112,4 +112,17 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Email Verification
+    |--------------------------------------------------------------------------
+    |
+    | This option controls whether email verification is required for new
+    | user registrations. When enabled, users must verify their email
+    | address before they can access the application.
+    |
+    */
+
+    'email_verification_required' => env('AUTH_EMAIL_VERIFICATION_REQUIRED', false),
+
 ];

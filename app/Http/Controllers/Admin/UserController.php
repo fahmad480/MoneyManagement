@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Illuminate\Validation\ValidationException;
 use Exception;
@@ -31,6 +32,15 @@ class UserController extends Controller
             $query->whereHas('roles', function($q) use ($request) {
                 $q->where('name', $request->role);
             });
+        }
+        
+        // Filter by email verification status
+        if ($request->filled('verified')) {
+            if ($request->verified === 'yes') {
+                $query->whereNotNull('email_verified_at');
+            } elseif ($request->verified === 'no') {
+                $query->whereNull('email_verified_at');
+            }
         }
         
         // Sort
@@ -115,6 +125,7 @@ class UserController extends Controller
                 'address' => 'nullable|string',
                 'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 'role' => 'required|exists:roles,name',
+                'email_verification_status' => 'nullable|in:verified,unverified',
             ]);
 
             $userData = [
@@ -126,6 +137,15 @@ class UserController extends Controller
 
             if ($request->filled('password')) {
                 $userData['password'] = Hash::make($validated['password']);
+            }
+
+            // Handle email verification status
+            if ($request->filled('email_verification_status')) {
+                if ($validated['email_verification_status'] === 'verified') {
+                    $userData['email_verified_at'] = $user->email_verified_at ?? now();
+                } else {
+                    $userData['email_verified_at'] = null;
+                }
             }
 
             if ($request->hasFile('profile_photo')) {
@@ -153,7 +173,10 @@ class UserController extends Controller
         try {
             $user = User::findOrFail($id);
             
-            if ($user->id === auth()->id()) {
+            /** @var \App\Models\User $authUser */
+            $authUser = Auth::user();
+            
+            if ($user->id === $authUser->id) {
                 return back()->with('error', 'Tidak bisa menghapus user sendiri!');
             }
             
@@ -165,6 +188,36 @@ class UserController extends Controller
 
             return redirect()->route('admin.users.index')
                 ->with('success', 'User berhasil dihapus!');
+        } catch (Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function toggleEmailVerification($id)
+    {
+        try {
+            /** @var \App\Models\User $user */
+            $user = User::findOrFail($id);
+            
+            /** @var \App\Models\User $authUser */
+            $authUser = Auth::user();
+            
+            if ($user->id === $authUser->id) {
+                return back()->with('error', 'Tidak bisa mengubah status verifikasi email sendiri!');
+            }
+            
+            // Toggle verification status
+            if (is_null($user->email_verified_at)) {
+                $user->email_verified_at = now();
+                $message = 'Email user berhasil diverifikasi!';
+            } else {
+                $user->email_verified_at = null;
+                $message = 'Verifikasi email user berhasil dibatalkan!';
+            }
+            
+            $user->save();
+
+            return back()->with('success', $message);
         } catch (Exception $e) {
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

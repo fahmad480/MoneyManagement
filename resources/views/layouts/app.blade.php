@@ -36,6 +36,39 @@
         <main class="@auth md:ml-64 @endauth min-h-screen">
             @auth
                 <div class="py-6 px-4 sm:px-6 lg:px-8">
+                    <!-- Email Verification Alert -->
+                    @if(is_null(Auth::user()->email_verified_at))
+                    <div x-data="{ show: true, sending: false }" x-show="show" class="email-verification-alert bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 px-4 py-3 rounded-lg mb-6" role="alert">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start flex-1">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-3 text-xl mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="font-semibold mb-1">Email Anda Belum Diverifikasi</p>
+                                    <p class="text-sm mb-3">Untuk keamanan akun Anda, silakan verifikasi email Anda. Kami telah mengirimkan link verifikasi ke <strong>{{ Auth::user()->email }}</strong></p>
+                                    <form id="resend-verification-form" class="inline">
+                                        @csrf
+                                        <button type="submit" 
+                                                x-bind:disabled="sending"
+                                                class="text-sm bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <span x-show="!sending">
+                                                <i class="fas fa-paper-plane mr-1"></i>
+                                                Kirim Ulang Email Verifikasi
+                                            </span>
+                                            <span x-show="sending" x-cloak>
+                                                <i class="fas fa-spinner fa-spin mr-1"></i>
+                                                Mengirim...
+                                            </span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <button @click="show = false" class="text-yellow-600 hover:text-yellow-800 ml-3">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    @endif
+                    
                     <!-- Flash Messages -->
                     @if(session('success'))
                     <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" class="bg-green-50 border-l-4 border-green-400 text-green-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between" role="alert">
@@ -89,5 +122,68 @@
     </div>
     
     @stack('scripts')
+    
+    <!-- Email Verification Resend Script -->
+    @auth
+    @if(is_null(Auth::user()->email_verified_at))
+    <script>
+    $(document).ready(function() {
+        $('#resend-verification-form').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Get Alpine.js component
+            const alpineData = Alpine.$data(this);
+            alpineData.sending = true;
+            
+            $.ajax({
+                url: '{{ route("verification.send") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    alpineData.sending = false;
+                    
+                    // Show success message
+                    const successAlert = `
+                        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" class="bg-green-50 border-l-4 border-green-400 text-green-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between" role="alert">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-600 mr-3 text-xl"></i>
+                                <span>${response.message}</span>
+                            </div>
+                            <button @click="show = false" class="text-green-600 hover:text-green-800">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    $('.email-verification-alert').after(successAlert);
+                },
+                error: function(xhr) {
+                    alpineData.sending = false;
+                    
+                    let message = xhr.responseJSON?.message || 'Terjadi kesalahan saat mengirim email verifikasi';
+                    
+                    // Show error message
+                    const errorAlert = `
+                        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" class="bg-red-50 border-l-4 border-red-400 text-red-800 px-4 py-3 rounded-lg mb-6 flex items-center justify-between" role="alert">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-circle text-red-600 mr-3 text-xl"></i>
+                                <span>${message}</span>
+                            </div>
+                            <button @click="show = false" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    $('.email-verification-alert').after(errorAlert);
+                }
+            });
+        });
+    });
+    </script>
+    @endif
+    @endauth
 </body>
 </html>
