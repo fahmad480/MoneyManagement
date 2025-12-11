@@ -11,7 +11,7 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Category::query();
+        $query = Category::where('user_id', auth()->id());
         
         // Search
         if ($request->filled('search')) {
@@ -54,6 +54,7 @@ class CategoryController extends Controller
                 'description' => 'nullable|string',
             ]);
 
+            $validated['user_id'] = auth()->id();
             Category::create($validated);
 
             return redirect()->route('categories.index')
@@ -69,7 +70,7 @@ class CategoryController extends Controller
     public function edit($id)
     {
         try {
-            $category = Category::findOrFail($id);
+            $category = Category::where('user_id', auth()->id())->findOrFail($id);
             return view('categories.edit', compact('category'));
         } catch (Exception $e) {
             return redirect()->route('categories.index')->with('error', 'Kategori tidak ditemukan!');
@@ -79,7 +80,7 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $category = Category::findOrFail($id);
+            $category = Category::where('user_id', auth()->id())->findOrFail($id);
             
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
@@ -104,7 +105,7 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         try {
-            $category = Category::findOrFail($id);
+            $category = Category::where('user_id', auth()->id())->findOrFail($id);
             $category->delete();
 
             return redirect()->route('categories.index')

@@ -37,8 +37,14 @@ class CategorySeeder extends Seeder
             ['name' => 'Lainnya', 'icon' => '💵', 'color' => '#DFE6E9', 'type' => 'income'],
         ];
 
-        foreach ($categories as $category) {
-            Category::create($category);
+        // Get first user for seeding, or you can specify a specific user
+        $userId = \App\Models\User::first()?->id;
+        
+        if ($userId) {
+            foreach ($categories as $category) {
+                $category['user_id'] = $userId;
+                Category::create($category);
+            }
         }
     }
 }

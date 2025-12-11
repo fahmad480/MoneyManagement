@@ -10,6 +10,7 @@ class Category extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'user_id',
         'name',
         'icon',
         'color',
@@ -23,6 +24,11 @@ class Category extends Model
     ];
 
     // Relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
