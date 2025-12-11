@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\ApiKeyManagementController;
 
 // Guest routes
 Route::middleware('guest')->group(function () {
@@ -83,6 +84,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
+    
+    // API Management
+    Route::prefix('api-management')->name('api.')->group(function () {
+        Route::get('/', [ApiKeyManagementController::class, 'index'])->name('management');
+        Route::post('/keys', [ApiKeyManagementController::class, 'store'])->name('keys.store');
+        Route::patch('/keys/{id}/toggle', [ApiKeyManagementController::class, 'toggleStatus'])->name('keys.toggle');
+        Route::delete('/keys/{id}', [ApiKeyManagementController::class, 'destroy'])->name('keys.destroy');
+        Route::get('/documentation', [ApiKeyManagementController::class, 'documentation'])->name('documentation');
+    });
     
     // Profile/Account Settings
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');

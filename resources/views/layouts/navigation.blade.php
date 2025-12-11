@@ -76,6 +76,13 @@
             </li>
             
             <li>
+                <a href="{{ route('api.management') }}" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 {{ request()->routeIs('api.*') ? 'bg-blue-50 text-blue-600' : '' }}">
+                    <i class="fas fa-code w-5"></i>
+                    <span class="ml-3">API Management</span>
+                </a>
+            </li>
+            
+            <li>
                 <a href="{{ route('profile.index') }}" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-blue-50 {{ request()->routeIs('profile.*') ? 'bg-blue-50 text-blue-600' : '' }}">
                     <i class="fas fa-user-cog w-5"></i>
                     <span class="ml-3">Pengaturan Akun</span>
