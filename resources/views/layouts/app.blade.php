@@ -6,6 +6,37 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }} - @yield('title')</title>
     
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Jangan Boros">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Jangan Boros">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="72x72" href="/icons/icon-72x72.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96x96.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="/icons/icon-128x128.png">
+    <link rel="icon" type="image/png" sizes="144x144" href="/icons/icon-144x144.png">
+    <link rel="icon" type="image/png" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="384x384" href="/icons/icon-384x384.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="384x384" href="/icons/icon-384x384.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -185,5 +216,64 @@
     </script>
     @endif
     @endauth
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/serviceworker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful:', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed:', err);
+                    });
+            });
+        }
+        
+        // Install PWA prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button/banner if you want
+            const installBanner = document.createElement('div');
+            installBanner.id = 'pwa-install-banner';
+            installBanner.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3';
+            installBanner.innerHTML = `
+                <i class="fas fa-download"></i>
+                <span>Install aplikasi ini</span>
+                <button onclick="installPWA()" class="bg-white text-indigo-600 px-3 py-1 rounded text-sm font-semibold hover:bg-gray-100">Install</button>
+                <button onclick="dismissInstall()" class="text-white hover:text-gray-200 ml-2"><i class="fas fa-times"></i></button>
+            `;
+            document.body.appendChild(installBanner);
+        });
+        
+        function installPWA() {
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.remove();
+            
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+        
+        function dismissInstall() {
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.remove();
+        }
+        
+        // Track app installation
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('App was installed');
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Test - Jangan Boros</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #4F46E5;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4F46E5;
+        }
+        
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status.error {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .status.pending {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        button {
+            background: #4F46E5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #4338CA;
+        }
+        
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .info {
+            background: #e0e7ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #3730a3;
+        }
+        
+        .code {
+            background: #1f2937;
+            color: #10b981;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .icon {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 PWA Test Dashboard</h1>
+        <p class="subtitle">Jangan Boros - Progressive Web App Testing</p>
+        
+        <!-- Service Worker Test -->
+        <div class="test-section">
+            <h3>
+                <span class="icon">⚙️</span>
+                Service Worker
+                <span id="sw-status" class="status pending">Testing...</span>
+            </h3>
+            <div class="test-item">
+                <span>Service Worker Support</span>
+                <span id="sw-support" class="status pending">-</span>
+            </div>
+            <div class="test-item">
+                <span>Service Worker Registration</span>
+                <span id="sw-registration" class="status pending">-</span>
+            </div>
+            <div class="test-item">
+                <span>Service Worker State</span>
+                <span id="sw-state" class="status pending">-</span>
+            </div>
+            <div id="sw-info" class="info" style="display: none;"></div>
+        </div>
+        
+        <!-- Manifest Test -->
+        <div class="test-section">
+            <h3>
+                <span class="icon">📱</span>
+                Web App Manifest
+                <span id="manifest-status" class="status pending">Testing...</span>
+            </h3>
+            <div class="test-item">
+                <span>Manifest File</span>
+                <span id="manifest-file" class="status pending">-</span>
+            </div>
+            <div class="test-item">
+                <span>Manifest Parse</span>
+                <span id="manifest-parse" class="status pending">-</span>
+            </div>
+            <button onclick="testManifest()">Test Manifest</button>
+            <div id="manifest-data" class="code" style="display: none;"></div>
+        </div>
+        
+        <!-- Icons Test -->
+        <div class="test-section">
+            <h3>
+                <span class="icon">🎨</span>
+                PWA Icons
+                <span id="icons-status" class="status pending">Testing...</span>
+            </h3>
+            <div id="icons-list"></div>
+            <button onclick="testIcons()">Test Icons</button>
+        </div>
+        
+        <!-- Cache Test -->
+        <div class="test-section">
+            <h3>
+                <span class="icon">💾</span>
+                Cache Storage
+                <span id="cache-status" class="status pending">Testing...</span>
+            </h3>
+            <div class="test-item">
+                <span>Cache API Support</span>
+                <span id="cache-support" class="status pending">-</span>
+            </div>
+            <div class="test-item">
+                <span>Cached Items</span>
+                <span id="cache-count" class="status pending">-</span>
+            </div>
+            <button onclick="testCache()">Test Cache</button>
+            <button onclick="clearCache()">Clear Cache</button>
+            <div id="cache-items" class="code" style="display: none;"></div>
+        </div>
+        
+        <!-- Offline Test -->
+        <div class="test-section">
+            <h3>
+                <span class="icon">🌐</span>
+                Offline Support
+                <span id="offline-status" class="status pending">Testing...</span>
+            </h3>
+            <div class="test-item">
+                <span>Current Status</span>
+                <span id="online-status" class="status pending">-</span>
+            </div>
+            <div class="info">
+                To test offline mode: Open DevTools > Network tab > Check "Offline" > Reload page
+            </div>
+        </div>
+        
+        <!-- Install Test -->
+        <div class="test-section">
+            <h3>
+                <span class="icon">📥</span>
+                Install Prompt
+                <span id="install-status" class="status pending">Testing...</span>
+            </h3>
+            <div class="test-item">
+                <span>Install Prompt Available</span>
+                <span id="install-available" class="status pending">-</span>
+            </div>
+            <button id="install-button" onclick="installApp()" disabled>Install App</button>
+            <div class="info">
+                Install prompt may not appear if app is already installed or criteria not met.
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let deferredPrompt;
+        
+        // Test Service Worker
+        async function testServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                document.getElementById('sw-support').textContent = 'Supported';
+                document.getElementById('sw-support').className = 'status success';
+                
+                try {
+                    const registration = await navigator.serviceWorker.register('/serviceworker.js');
+                    document.getElementById('sw-registration').textContent = 'Registered';
+                    document.getElementById('sw-registration').className = 'status success';
+                    
+                    if (registration.active) {
+                        document.getElementById('sw-state').textContent = 'Active';
+                        document.getElementById('sw-state').className = 'status success';
+                        document.getElementById('sw-status').textContent = 'Passed';
+                        document.getElementById('sw-status').className = 'status success';
+                        
+                        const info = document.getElementById('sw-info');
+                        info.style.display = 'block';
+                        info.innerHTML = `<strong>Scope:</strong> ${registration.scope}<br><strong>Update Found:</strong> ${registration.updatefound ? 'Yes' : 'No'}`;
+                    } else {
+                        document.getElementById('sw-state').textContent = 'Installing';
+                        document.getElementById('sw-state').className = 'status pending';
+                    }
+                } catch (error) {
+                    document.getElementById('sw-registration').textContent = 'Failed';
+                    document.getElementById('sw-registration').className = 'status error';
+                    document.getElementById('sw-status').textContent = 'Failed';
+                    document.getElementById('sw-status').className = 'status error';
+                }
+            } else {
+                document.getElementById('sw-support').textContent = 'Not Supported';
+                document.getElementById('sw-support').className = 'status error';
+                document.getElementById('sw-status').textContent = 'Failed';
+                document.getElementById('sw-status').className = 'status error';
+            }
+        }
+        
+        // Test Manifest
+        async function testManifest() {
+            try {
+                const response = await fetch('/manifest.json');
+                document.getElementById('manifest-file').textContent = 'Found';
+                document.getElementById('manifest-file').className = 'status success';
+                
+                const manifest = await response.json();
+                document.getElementById('manifest-parse').textContent = 'Valid';
+                document.getElementById('manifest-parse').className = 'status success';
+                document.getElementById('manifest-status').textContent = 'Passed';
+                document.getElementById('manifest-status').className = 'status success';
+                
+                const manifestData = document.getElementById('manifest-data');
+                manifestData.style.display = 'block';
+                manifestData.textContent = JSON.stringify(manifest, null, 2);
+            } catch (error) {
+                document.getElementById('manifest-file').textContent = 'Not Found';
+                document.getElementById('manifest-file').className = 'status error';
+                document.getElementById('manifest-status').textContent = 'Failed';
+                document.getElementById('manifest-status').className = 'status error';
+            }
+        }
+        
+        // Test Icons
+        async function testIcons() {
+            const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+            const iconsList = document.getElementById('icons-list');
+            iconsList.innerHTML = '';
+            
+            let successCount = 0;
+            
+            for (const size of sizes) {
+                const url = `/icons/icon-${size}x${size}.png`;
+                const item = document.createElement('div');
+                item.className = 'test-item';
+                
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        item.innerHTML = `
+                            <span>icon-${size}x${size}.png</span>
+                            <span class="status success">✓ Found</span>
+                        `;
+                        successCount++;
+                    } else {
+                        item.innerHTML = `
+                            <span>icon-${size}x${size}.png</span>
+                            <span class="status error">✗ Missing</span>
+                        `;
+                    }
+                } catch (error) {
+                    item.innerHTML = `
+                        <span>icon-${size}x${size}.png</span>
+                        <span class="status error">✗ Error</span>
+                    `;
+                }
+                
+                iconsList.appendChild(item);
+            }
+            
+            document.getElementById('icons-status').textContent = `${successCount}/${sizes.length}`;
+            document.getElementById('icons-status').className = successCount === sizes.length ? 'status success' : 'status error';
+        }
+        
+        // Test Cache
+        async function testCache() {
+            if ('caches' in window) {
+                document.getElementById('cache-support').textContent = 'Supported';
+                document.getElementById('cache-support').className = 'status success';
+                
+                const cacheNames = await caches.keys();
+                const cacheItems = document.getElementById('cache-items');
+                
+                if (cacheNames.length > 0) {
+                    let totalItems = 0;
+                    let itemsList = '';
+                    
+                    for (const cacheName of cacheNames) {
+                        const cache = await caches.open(cacheName);
+                        const keys = await cache.keys();
+                        totalItems += keys.length;
+                        itemsList += `\n[${cacheName}] - ${keys.length} items:\n`;
+                        keys.forEach(req => {
+                            itemsList += `  - ${req.url}\n`;
+                        });
+                    }
+                    
+                    document.getElementById('cache-count').textContent = `${totalItems} items`;
+                    document.getElementById('cache-count').className = 'status success';
+                    document.getElementById('cache-status').textContent = 'Active';
+                    document.getElementById('cache-status').className = 'status success';
+                    
+                    cacheItems.style.display = 'block';
+                    cacheItems.textContent = itemsList;
+                } else {
+                    document.getElementById('cache-count').textContent = '0 items';
+                    document.getElementById('cache-count').className = 'status pending';
+                    document.getElementById('cache-status').textContent = 'Empty';
+                    document.getElementById('cache-status').className = 'status pending';
+                }
+            } else {
+                document.getElementById('cache-support').textContent = 'Not Supported';
+                document.getElementById('cache-support').className = 'status error';
+                document.getElementById('cache-status').textContent = 'Failed';
+                document.getElementById('cache-status').className = 'status error';
+            }
+        }
+        
+        // Clear Cache
+        async function clearCache() {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map(name => caches.delete(name)));
+            alert('Cache cleared! Reload page to rebuild cache.');
+            location.reload();
+        }
+        
+        // Test Online Status
+        function testOnlineStatus() {
+            const status = navigator.onLine ? 'Online' : 'Offline';
+            const className = navigator.onLine ? 'status success' : 'status error';
+            document.getElementById('online-status').textContent = status;
+            document.getElementById('online-status').className = className;
+            document.getElementById('offline-status').textContent = navigator.onLine ? 'Ready' : 'Offline Mode';
+            document.getElementById('offline-status').className = navigator.onLine ? 'status success' : 'status pending';
+        }
+        
+        // Install App
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-available').textContent = 'Available';
+            document.getElementById('install-available').className = 'status success';
+            document.getElementById('install-status').textContent = 'Ready';
+            document.getElementById('install-status').className = 'status success';
+            document.getElementById('install-button').disabled = false;
+        });
+        
+        async function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    alert('App installed successfully!');
+                }
+                deferredPrompt = null;
+                document.getElementById('install-button').disabled = true;
+            }
+        }
+        
+        window.addEventListener('appinstalled', () => {
+            alert('App installed successfully!');
+            document.getElementById('install-status').textContent = 'Installed';
+            document.getElementById('install-status').className = 'status success';
+        });
+        
+        // Run tests on load
+        window.addEventListener('load', () => {
+            testServiceWorker();
+            testManifest();
+            testIcons();
+            testCache();
+            testOnlineStatus();
+            
+            // Check if already installed
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                document.getElementById('install-available').textContent = 'Already Installed';
+                document.getElementById('install-available').className = 'status success';
+                document.getElementById('install-status').textContent = 'Installed';
+                document.getElementById('install-status').className = 'status success';
+            }
+        });
+        
+        // Listen to online/offline events
+        window.addEventListener('online', testOnlineStatus);
+        window.addEventListener('offline', testOnlineStatus);
+    </script>
+</body>
+</html>
