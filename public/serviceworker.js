@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jangan-boros-v1';
+const CACHE_NAME = 'jangan-boros-v2';
 const urlsToCache = [
     '/',
     '/manifest.json',
@@ -29,6 +29,38 @@ self.addEventListener('install', event => {
 
 // Fetch from cache
 self.addEventListener('fetch', event => {
+    const url = new URL(event.request.url);
+    
+    // Network First strategy for API calls and dynamic content
+    if (url.pathname.startsWith('/api/') || 
+        url.pathname.includes('categories') || 
+        url.pathname.includes('transactions') ||
+        url.pathname.includes('banks') ||
+        url.pathname.includes('cards') ||
+        event.request.method !== 'GET') {
+        
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    // Only cache successful GET requests
+                    if (event.request.method === 'GET' && response.status === 200) {
+                        const responseToCache = response.clone();
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+                    }
+                    return response;
+                })
+                .catch(err => {
+                    // If network fails, try cache as fallback
+                    return caches.match(event.request)
+                        .then(response => response || caches.match('/offline.html'));
+                })
+        );
+        return;
+    }
+    
+    // Cache First strategy for static assets
     event.respondWith(
         caches.match(event.request)
             .then(response => {
