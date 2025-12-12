@@ -33,4 +33,15 @@ class Category extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    // Scopes
+    public function scopeDefault($query)
+    {
+        return $query->whereNull('user_id');
+    }
+
+    public function scopeUserOwned($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
 }

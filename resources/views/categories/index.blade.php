@@ -7,12 +7,20 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-gray-800">Kategori Transaksi</h1>
-        @can('create-categories')
-        <a href="{{ route('categories.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-            <i class="fas fa-plus"></i>
-            Tambah Kategori
-        </a>
-        @endcan
+        <div class="flex gap-2">
+            @if($defaultCategoriesCount > 0)
+            <a href="{{ route('categories.import-default') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                <i class="fas fa-download"></i>
+                Import Default
+            </a>
+            @endif
+            @can('create-categories')
+            <a href="{{ route('categories.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                <i class="fas fa-plus"></i>
+                Tambah Kategori
+            </a>
+            @endcan
+        </div>
     </div>
 
     <!-- Filter & Search -->

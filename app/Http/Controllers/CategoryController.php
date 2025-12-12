@@ -35,7 +35,10 @@ class CategoryController extends Controller
         $perPage = $request->get('per_page', 20);
         $categories = $query->paginate($perPage)->appends($request->all());
         
-        return view('categories.index', compact('categories'));
+        // Check if there are default categories available to import
+        $defaultCategoriesCount = Category::default()->count();
+        
+        return view('categories.index', compact('categories', 'defaultCategoriesCount'));
     }
 
     public function create()
@@ -110,6 +113,72 @@ class CategoryController extends Controller
 
             return redirect()->route('categories.index')
                 ->with('success', 'Kategori berhasil dihapus!');
+        } catch (Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function getDefaultCategories()
+    {
+        try {
+            $defaultCategories = Category::default()
+                ->orderBy('type')
+                ->orderBy('name')
+                ->get();
+            
+            return view('categories.import-default', compact('defaultCategories'));
+        } catch (Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function importDefaultCategories(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'category_ids' => 'required|array',
+                'category_ids.*' => 'exists:categories,id',
+            ]);
+
+            $userId = auth()->id();
+            $imported = 0;
+            
+            // Get default categories to import
+            $defaultCategories = Category::default()
+                ->whereIn('id', $validated['category_ids'])
+                ->get();
+            
+            foreach ($defaultCategories as $category) {
+                // Check if user already has a category with the same name and type
+                $exists = Category::where('user_id', $userId)
+                    ->where('name', $category->name)
+                    ->where('type', $category->type)
+                    ->exists();
+                
+                if (!$exists) {
+                    Category::create([
+                        'user_id' => $userId,
+                        'name' => $category->name,
+                        'icon' => $category->icon,
+                        'color' => $category->color,
+                        'type' => $category->type,
+                        'description' => $category->description,
+                        'is_active' => $category->is_active,
+                    ]);
+                    $imported++;
+                }
+            }
+
+            if ($imported > 0) {
+                return redirect()->route('categories.index')
+                    ->with('success', "$imported kategori berhasil diimport!");
+            } else {
+                return redirect()->route('categories.index')
+                    ->with('info', 'Kategori yang dipilih sudah ada di akun Anda.');
+            }
+                
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
         } catch (Exception $e) {
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
